@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout do código
+      - name: 📥 Checkout do código hehe
         uses: actions/checkout@v3
 
       - name: 🐳 Build da imagem Docker
