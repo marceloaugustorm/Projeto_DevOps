@@ -6,19 +6,37 @@ on:
       - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
+    outputs:
+      image-tag: ${{ steps.build.outputs.image-tag }}
     steps:
-      - name: 📥 Checkout do código hehe
+      - name:  Checkout do código hehe
         uses: actions/checkout@v3
 
-      - name: 🐳 Build da imagem Docker
-        run: docker build -t flask-app .
+      - name:  Build da imagem Docker
+        id: build
+        run: |
+          docker build -t flask-app .
+          echo "image-tag=flask-app" >> $GITHUB_OUTPUT
 
-      - name: 🧪 Rodar testes dentro do container
-        run: docker run --rm flask-app python test_app.py
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name:  Checkout do código
+        uses: actions/checkout@v3
 
-      - name: 🚀 Disparar deploy na Render
+      - name:  Rodar testes no container
+        run: |
+          docker build -t flask-app .
+          docker run --rm flask-app python test_app.py
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name:  Disparar deploy na Render
         run: |
           curl -X POST "https://api.render.com/deploy/srv-d0p81oodl3ps73ai525g?key=cRIhGQiH2UM"
+
